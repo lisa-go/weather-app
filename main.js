@@ -16,7 +16,7 @@
   \**********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./style.scss */ \"./src/style.scss\");\n\n\n//# sourceURL=webpack://weather-app/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _style_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./style.scss */ \"./src/style.scss\");\n\nasync function getWeather() {\n  const text = document.querySelector('.text');\n  const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Tokyo&APPID=24c9ca958f3c17129e987bac3597de6a');\n  const weatherData = await response.json();\n  console.log(weatherData);\n}\ngetWeather();\n\n//# sourceURL=webpack://weather-app/./src/index.js?");
 
 /***/ }),
 
