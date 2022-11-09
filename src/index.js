@@ -42,10 +42,12 @@ async function getWeather(choice, geo) {
     }
 }
 
+
 //* default location *//
+
+
 if (document.querySelector('#location').value == '') {
-    getWeather( 'weather', 'tokyo' )
-    .then((weatherData) => {
+    getWeather( 'weather', 'tokyo' ).then((weatherData) => {
         document.querySelector('.w-info').textContent = weatherData.weather[0].main;
         document.querySelector('.w-infod').textContent = weatherData.weather[0].description;
         document.querySelector('.w-location').textContent = weatherData.name + ', ' + weatherData.sys.country;       
@@ -124,6 +126,8 @@ if (document.querySelector('#location').value == '') {
             
     });
 };
+
+
 
 //* button event listener *//
 document.querySelector('#submit').addEventListener('click', function() {
@@ -204,9 +208,8 @@ document.querySelector('#submit').addEventListener('click', function() {
             }
             wimgc.style.backgroundRepeat = 'no-repeat';
             wimgc.style.backgroundSize = 'contain';
-            document.body.style.backgroundSize = 'cover';
-            
-
+            document.body.style.backgroundSize = 'cover';  
+            getForecast();
     }
         catch {
             console.log (weatherData);
@@ -235,3 +238,73 @@ function timeConverter(UNIX_timestamp){
   humIcon.src = humidityPic;
   document.querySelector('.w-humidity').appendChild(humIcon);
 
+
+function getForecast() {
+    getWeather('forecast', document.querySelector('#location').value ).then((weatherData) => {
+        const fcont = document.querySelector('#forecastContainer');
+
+            //* every day at 12pm for 5 days *//
+        for (let i = 1; i < weatherData.list.length; i = i + 8) {
+            const fcard = document.createElement('fcard');
+            fcard.textContent = weatherData.list[i].dt_txt + ' ' + weatherData.list[i].main.temp;
+            fcont.appendChild(fcard);
+
+            const fimg = document.createElement('fimg');
+            let wid = weatherData.list[i].weather[0].id;
+            
+            if (wid >= 200 && wid <= 232) {
+                const img = thunderPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+
+            if (wid >= 300 && wid <= 531) {
+                const img = rainPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+            
+            if (wid >= 600 && wid <= 622) {
+                const img = snowPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+
+            if (wid >= 701 && wid <= 781) {
+                const img = fogPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+
+            if (wid == 800 && timeConverter(weatherData.dt).hour > 7 && timeConverter(weatherData.dt).hour < 17) {
+                const img = sunPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+            else if (wid == 800) {
+                const img = moonPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+
+            if (wid == 801 && timeConverter(weatherData.dt).hour > 7 && timeConverter(weatherData.dt).hour < 17) {
+                const img = pclouddayPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+            else if (wid == 801) {
+                const img = pcloudnightPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+
+            if (wid >= 802 && wid <= 804) {
+                const img = cloudPic;
+                fimg.style.background = 'url(' + img + ')';
+            }
+            fimg.style.backgroundRepeat = 'no-repeat';
+            fimg.style.backgroundSize = 'contain';
+
+            
+            fcard.appendChild(fimg)
+
+            
+                
+
+        
+        }
+        
+    });
+}

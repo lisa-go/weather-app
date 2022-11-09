@@ -34,4 +34,19 @@ body {
 #forecastContainer {
     grid-column: 1 / 4;
     background-color: rgba(0, 0, 0, 0.397);
+    display: flex;
+    gap: 1rem;
+    
+    fcard {
+        background-color: grey;
+        width: fit-content;
+        height: 200px;
+
+        fimg {
+            display: flex;
+            height: 50px;
+            width: 50px;
+        }
+    }
+
 }
