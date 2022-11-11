@@ -13,12 +13,22 @@ import rainBg from './images/rain-noah-silliman-unsplash.jpg';
 import snowBg from './images/snow-aditya-vyas-unsplash.jpg';
 import thunderBg from './images/thunder-levi-guzman-unsplash.jpg';
 import cloudyBg from './images/cloudy-tengyart-unsplash.jpg';
+import gitIcon from './images/github.svg';
+
 const location = document.querySelector('#location');
+const degSwitch = document.querySelector('#degSwitch');
+
 
 async function getWeather(choice) {
     //* mode = weather or forecast *//
-    
+    var deg;
     try {
+        if (degSwitch.checked) {
+            deg = 'metric';
+        }
+        else {
+            deg = 'imperial';
+        }
     let mode = choice;
     
     const response = 
@@ -27,7 +37,8 @@ async function getWeather(choice) {
         '?q=' +
         location.value + 
         '&APPID=24c9ca958f3c17129e987bac3597de6a' +
-        '&units=imperial'); //*or metric for celcius*//
+        '&units=' +
+        deg );
 
     const weatherData = await response.json();
     console.log(weatherData);
@@ -42,7 +53,7 @@ async function getWeather(choice) {
 //* default location *//
 if (location.value == '') {
     location.value = 'houston'
-    getWeather( 'weather', document.querySelector('#location').value )
+    getWeather( 'weather')
     .then((weatherData) => {
         try {
             showData();
@@ -56,7 +67,20 @@ if (location.value == '') {
 
 //* button event listener *//
 document.querySelector('#submit').addEventListener('click', function() {
-    getWeather( 'weather', document.querySelector('#location').value )
+    getWeather('weather')
+    .then((weatherData) => {
+        try {
+            showData();    
+    }
+        catch {
+            console.log (weatherData);
+        }
+    });
+});
+
+//* switch event listener *//
+document.querySelector('#degSwitch').addEventListener('click', function() {
+    getWeather('weather')
     .then((weatherData) => {
         try {
             showData();    
@@ -78,6 +102,7 @@ function getForecast() {
 
         for (let i = 0, j = 0; i < weatherData.list.length; i = i + 8, j++) {
             const fcard = document.createElement('fcard');
+            fcard.classList.add('card');
             fcont.appendChild(fcard);
 
             const fimg = document.createElement('fimg');
@@ -116,8 +141,20 @@ function getForecast() {
             fimg.style.backgroundSize = 'contain';
             fcard.appendChild(fimg);
 
+            const fday = document.createElement('fday');
+                if (j == 0) {
+                    fday.textContent = 'Today';
+                }
+                else if (j == 1) {
+                    fday.textContent = 'Tomorrow';
+                }
+                else {
+                    fday.textContent = daysFromToday(j);
+                }
+                fcard.appendChild(fday);
+
             const fdate = document.createElement('fdate');
-            fdate.textContent = daysFromToday(j) + ' ' + timeConverter(weatherData.list[i].dt);
+            fdate.textContent = timeConverter(weatherData.list[i].dt);
             fcard.appendChild(fdate);
 
             const fwhem = document.createElement('fwhem');
@@ -128,31 +165,55 @@ function getForecast() {
             fwhed.textContent = weatherData.list[i].weather[0].description;
             fcard.appendChild(fwhed);
 
+            var deg;
+            if (degSwitch.checked) {
+                deg = ' °C';
+            }
+            else {
+                deg = ' °F';
+            }
+
             const ftemp = document.createElement('ftemp');
             fcard.appendChild(ftemp);
                 const tempimg = new Image();
                 tempimg.src = thermostatPic;
                 ftemp.appendChild(tempimg);
                 const ftempn = document.createElement('ftempn');
-                ftempn.textContent = weatherData.list[i].main.temp + ' °F';
+                ftempn.textContent = Math.round(weatherData.list[i].main.temp * 10) / 10 + deg;
                 ftemp.appendChild(ftempn);
 
             const ftempf = document.createElement('ftempm');
-            ftempf.textContent = 'Feels like ' + weatherData.list[i].main.feels_like + ' °F';
+            ftempf.textContent = 'Feels like ' + Math.round(weatherData.list[i].main.feels_like * 10) / 10 + deg;
             fcard.appendChild(ftempf);
+
+            const fhumid = document.createElement('fhumid');
+            fcard.appendChild(fhumid);
+            const fhumidp = new Image();
+            fhumidp.src = humidityPic;
+            fhumid.appendChild(fhumidp);
+            const fhumidt = document.createElement('fhumidt');
+            fhumidt.textContent = 'Humidity: ' + weatherData.list[i].main.humidity + '%';
+            fhumid.appendChild(fhumidt);
         }
         
     });
 }
 
 function showData(){
-    getWeather( 'weather' ).then((weatherData) => {
-        
+    getWeather('weather').then((weatherData) => {
+        var deg;
+        if (degSwitch.checked) {
+            deg = ' °C';
+        }
+        else {
+            deg = ' °F';
+        }
+
         document.querySelector('.w-info').textContent = weatherData.weather[0].main;
         document.querySelector('.w-infod').textContent = weatherData.weather[0].description;
         document.querySelector('.w-location').textContent = weatherData.name + ', ' + weatherData.sys.country;       
-        document.querySelector('.wtemp').textContent = weatherData.main.temp + ' °F';
-        document.querySelector('.w-tempfeel').textContent = 'Feels like ' + weatherData.main.feels_like + ' °F';
+        document.querySelector('.wtemp').textContent = Math.round(weatherData.main.temp * 10) / 10 + deg;
+        document.querySelector('.w-tempfeel').textContent = 'Feels like ' + Math.round(weatherData.main.feels_like * 10) / 10 + deg;
         document.querySelector('.w-datetime').textContent = daysFromToday(0) + ' ' + timeConverter(weatherData.dt);
         document.querySelector('.whumid').textContent = 'Humidity: ' + weatherData.main.humidity + '%';
             
@@ -239,3 +300,11 @@ function timeConverter(UNIX_timestamp){
   const humIcon = new Image();
   humIcon.src = humidityPic;
   document.querySelector('.w-humidity').appendChild(humIcon);
+
+  const githuba = document.createElement('a');
+  githuba.href = 'https://github.com/lisa-go';
+  githuba.classList.add('link');
+  document.querySelector('.header').appendChild(githuba);
+  const github = new Image();
+  github.src = gitIcon;
+  githuba.appendChild(github);
